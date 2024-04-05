@@ -1,0 +1,31 @@
+Task:
+  project: 'template'
+  mode: 'train' # [train, train-valid, test]
+  logger: 'wandb'   # ['none', 'wandb', ...]
+  seed: 2024
+
+Trainer:
+  max_epoch: 1000
+  batch_size: 32
+  # enable if (early_stop < max_epoch)
+  early_stop: 100   
+  
+Tester:
+  model_path: ''
+  batch_size: 32
+  bench_mark: ''
+  visualization: False
+
+BenchMark:
+  - ConfuseMatrix
+
+# Model Integration Configs  
+ModelInt:
+  name: 'template'
+  dataset: 'template_dataset'
+  # model args config
+  model_args: {}
+  # optimizer args config
+  optim_args: 
+    lr: 1e-4
+    weight_decay: 1e-3
