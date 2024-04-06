@@ -1,9 +1,9 @@
 Task:
-  project: 'template'
-  run: 'test'
-  mode: 'train' # [train, train-valid, test]
-  logger: 'local'   # ['local', 'wandb', ...]
-  seed: 2024
+  project: 'template' # Model Int Name
+  runID:   'demo'     # run ID
+  mode:    'test'    # [train, test]
+  logger:  'local'    # ['local', 'wandb', ...]
+  seed:     2024
 
 Trainer:
   train_logger_name: 'train'
@@ -17,8 +17,6 @@ Tester:
   test_logger_name: 'test'
   model_path: ''
   batch_size: 32
-  bench_mark: ''
-  visualization: False
 
 BenchMark:
   - ConfuseMatrix

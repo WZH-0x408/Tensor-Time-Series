@@ -1,3 +1,4 @@
+import os
 import torch
 from torch.utils.data import DataLoader
 from .Logger import Logger
@@ -14,6 +15,9 @@ class Tester:
         # Tester configs
         tester_configs = configs['Tester']
         batch_size = tester_configs['batch_size']
+        model_path = tester_configs['model_path']
+        if not os.path.exists(model_path):
+            raise FileExistsError(f'{model_path} is not a model path')
         # Model Integration configs
         model_int_configs = configs['ModelInt']
         model_int_name = model_int_configs['name']
@@ -26,6 +30,7 @@ class Tester:
         # model
         model_class = model_int.get_model_class()
         self.model = model_class(**model_args)
+        self.model.load_state_dict(torch.load(model_path))
         # dataset
         testset = model_int.get_dataset(mode='test')
         self.test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)

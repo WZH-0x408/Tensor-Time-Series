@@ -15,7 +15,9 @@ class Trainer:
         self.config = configs
         # Task configs
         task_configs = configs['Task']
-        mode = task_configs['mode']
+        self.model_save_path = os.path.join(task_configs['out_dir'], 'model')
+        if not os.path.exists(self.model_save_path):
+            os.mkdir(self.model_save_path)
         # Trainer configs
         trainer_config = configs['Trainer']
         batch_size = trainer_config['batch_size']
@@ -77,7 +79,7 @@ class Trainer:
             loss_list.append(loss.item())
         info['loss'] = sum(loss_list)/len(loss_list)
         self.train_logger.epoch_update(info)
-        return info
+        # return info
 
     def epoch_valid(self, epoch)->dict:
         info = {
@@ -103,23 +105,29 @@ class Trainer:
         info.update(self.benchmark.get_log())
         info['loss'] = sum(loss_list) / len(loss_list)
         print(f">> epoch: {epoch}: {info['loss']}")
+        stop_flag = self.epoch_early_stop(info['loss'])
+        # some vars
+        info['early_stop_count'] = self.early_stop
+        info['best_loss'] = self.best_loss
         self.valid_logger.epoch_update(info)
-        return info
+        return stop_flag
 
-    def epoch_early_stop(self, info:dict):
-        if info['valid/loss'] < self.best_loss:
-            self.best_loss = info['valid/loss']
+    def epoch_early_stop(self, loss):
+        if loss < self.best_loss:
+            self.best_loss = loss
             self.early_stop_count = 0
-            self.save_model()
+            self.save_model('best_model.pth')
         else:
             self.early_stop_count += 1
         if self.early_stop_count >= self.early_stop:
-            # print(...)
             return True
         return False
 
-    def save_model(self, path):
-        pass
+    def save_model(self, model_name):
+        if '.pth' not in model_name:
+            model_name = f"{model_name}.pth"
+        save_path = os.path.join(self.model_save_path, model_name)
+        torch.save(self.model.state_dict(), save_path)
 
     def train(self):
         # prepare?
@@ -130,11 +138,11 @@ class Trainer:
         for epoch in range(self.max_epoch):
             info['epoch'] = epoch
             # epoch train and 
-            train_info = self.epoch_train(epoch)
+            self.epoch_train(epoch)
             # if valid ?
-            valid_info = self.epoch_valid(epoch)
-            # update info
-            # self.logger.update(train_info)
-            # self.logger.update(valid_info)
+            stop_flag = self.epoch_valid(epoch)
+            if stop_flag:
+                print(f'The model has not improved. STOP TRAINING.')
+                break
         # train - end
     

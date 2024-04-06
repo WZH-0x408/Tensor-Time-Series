@@ -78,7 +78,7 @@ class wandbBackend(BackendBase):
         super().__init__(root_dir, configs=configs)
         task_configs = configs['Task']
         project = task_configs['project']
-        run_name = task_configs['run']
+        run_name = task_configs['runID']
         wandb.init(dir=root_dir, project=project, name=run_name,config=configs)
 
     def add_logger(self, logger_name):
