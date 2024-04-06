@@ -9,7 +9,7 @@ class Logger:
 
     def init(self, logger_name:str, track_list=[]):        
         self.logger_name = logger_name
-        self.track_list = self.parse_track_list(logger_name, track_list)
+        self.track_list, self.track_with_colon = self.parse_track_list(logger_name, track_list)
         Logger.logger_backend.add_logger(logger_name, self.track_list)
 
     def set_backend(self, root_dir ,backend='local'):
@@ -24,13 +24,17 @@ class Logger:
 
     def parse_track_list(self, logger_name, track_list):
         logger_track_list = []
+        colon_track_list = []
         for var_name in track_list:
             if '/' in var_name:
                 var_name_splited = var_name.split('/')
                 if len(var_name_splited) == 2:
                     if var_name_splited[0] == logger_name:
                         logger_track_list.append(var_name_splited[1])
-        return logger_track_list
+                        if ':' in var_name_splited[1]:
+                            colon_sp = var_name_splited[1].split(':')
+                            colon_track_list.append(colon_sp)
+        return logger_track_list, colon_track_list
 
     def add_sub_logger(self):
         new_logger = Logger()
@@ -41,10 +45,28 @@ class Logger:
         Logger.logger_backend.log(self.logger_name, name, var)
 
     def epoch_update(self, local_vars:dict):
-        print(local_vars)
-        print(self.track_list)
+        # print(local_vars)
+        # print(self.track_list)
         for var_name in local_vars:
+            # if ':' in var_name:
+            #     # colon case
+            #     var_name_sp = var_name.split(':')
+            #     track_sp = self.search_track(var_name_sp)
+            #     if self.match_track(track_sp, var_name_sp):
+            #         self.log(var_name, local_vars[var_name])
             if var_name in self.track_list:
                 self.log(var_name, local_vars[var_name])
         Logger.logger_backend.update(self.logger_name)
 
+    def search_track(self, name_sp):
+        for track_sp in self.track_with_colon:
+            if name_sp[0] == track_sp[0]:
+                return track_sp
+                
+    def match_track(self, track_sp, name_sp):
+        for i in range(len(track_sp)):
+            if track_sp[i] == "*":
+                return True
+            elif track_sp[i] != name_sp[i]:
+                return False
+        return True

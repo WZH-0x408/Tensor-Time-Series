@@ -8,6 +8,7 @@ class BackendBase:
     def __init__(self, root_dir) -> None:
         self.root_dir = root_dir    # the root directory for log fiels
         self.track_var = set()
+        self.track_var_with_colon = []
         self.log_frame = {}
     def add_logger(self, logger_name, track_list:list):
         pass

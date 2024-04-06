@@ -100,7 +100,9 @@ class Trainer:
                 pred_list.extend(pred)
         # bench mark
         self.benchmark.eval(pred_list, gt_list)
+        info.update(self.benchmark.get_log())
         info['loss'] = sum(loss_list) / len(loss_list)
+        print(f">> epoch: {epoch}: {info['loss']}")
         self.valid_logger.epoch_update(info)
         return info
 
