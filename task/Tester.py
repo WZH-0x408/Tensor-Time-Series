@@ -39,18 +39,19 @@ class Tester:
 
     def test(self):
         info = {}
+        self.model.to(self.device)
         self.model.eval()
         pred_list = []
         gt_list = []
         with torch.no_grad():
-            for (data, gt) in self.valid_loader:
+            for (data, gt) in self.test_loader:
                 data = data.to(self.device)
+                gt = gt.to(self.device)
                 pred = self.model(data)
-                if isinstance(gt, torch.Tensor):
-                    gt = gt.cpu().numpy()
+                gt = gt.cpu().numpy()
                 pred = pred.cpu().numpy()
-                pred_list.append(pred)
-                gt_list.append(gt)
+                pred_list.extend(pred)
+                gt_list.extend(gt)
         # bench mark
         self.benchmark.eval(pred_list, gt_list)
         self.output_result()

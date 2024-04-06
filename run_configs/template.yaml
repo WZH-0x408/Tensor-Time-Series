@@ -5,12 +5,15 @@ Task:
   seed: 2024
 
 Trainer:
-  max_epoch: 1000
+  train_logger_name: 'train'
+  valid_logger_name: 'valid'
+  max_epoch: 30
   batch_size: 32
   # enable if (early_stop < max_epoch)
   early_stop: 100   
   
 Tester:
+  test_logger_name: 'test'
   model_path: ''
   batch_size: 32
   bench_mark: ''
@@ -28,4 +31,11 @@ ModelInt:
   # optimizer args config
   optim_args: 
     lr: 1e-4
-    weight_decay: 1e-3
+    # weight_decay: 1e-3
+
+Logger:
+  track_list:
+    - 'train/epoch'
+    - 'train/loss'
+    - 'valid/epoch'
+    - 'valid/loss'
