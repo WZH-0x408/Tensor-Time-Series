@@ -6,7 +6,6 @@ from benchmark.benchmark_manager import Benchmark
 
 class Tester:
     def __init__(self, configs:dict, logger: Logger) -> None:
-        self.logger = logger
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         # load configs
         self.configs = configs
@@ -33,9 +32,11 @@ class Tester:
         # bench mark
         bench_mark_list = configs['BenchMark']
         self.benchmark = Benchmark(bench_mark_list)
+        # logger
+        track_list = configs['Logger']['track_list']
+        self.test_logger = logger.add_sub_logger()
+        self.test_logger.init('test', track_list)
 
-    def output_result(self):
-        pass
 
     def test(self):
         info = {}
@@ -54,6 +55,8 @@ class Tester:
                 gt_list.extend(gt)
         # bench mark
         self.benchmark.eval(pred_list, gt_list)
-        self.output_result()
+        info.update(self.benchmark.get_log())
+        self.test_logger.epoch_update(info)
+        return info
         # test - end
 

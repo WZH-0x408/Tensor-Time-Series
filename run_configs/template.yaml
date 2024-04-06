@@ -1,7 +1,8 @@
 Task:
   project: 'template'
+  run: 'test'
   mode: 'train' # [train, train-valid, test]
-  logger: 'wandb'   # ['none', 'wandb', ...]
+  logger: 'local'   # ['local', 'wandb', ...]
   seed: 2024
 
 Trainer:
@@ -39,9 +40,6 @@ Logger:
     - 'train/loss'
     - 'valid/epoch'
     - 'valid/loss'
-    - 'valid/ConfuseMatrix:1:acc'
-    - 'valid/ConfuseMatrix:1:pre'
-    - 'valid/ConfuseMatrix:1:rec'
-    - 'valid/ConfuseMatrix:1:f1'
-    - 'valid/ConfuseMatrix:macro-f1'
+    - 'valid/ConfuseMatrix:*'
+    - 'test/ConfuseMatrix:*'
 
