@@ -4,6 +4,9 @@ import scipy
 import scipy.stats
 from sklearn.metrics.pairwise import cosine_similarity
 
+import sys, os
+pth=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(pth)) #./Tensor-Time-Series
 from datasets.dataset import TTS_Dataset
 
 
@@ -62,3 +65,28 @@ class GraphGenerator:
     def load_pkl_graph(self, pkl_path:str):
         graph = pickle.load(open(pkl_path, 'rb'))
         return graph
+    
+    #method to generate adjacency matrix in datasets with spatial information(PEMS, METR-LA, etc.)
+    def space_adj_matrix(self, dist_path, n_vertex):
+        import csv
+        with open(dist_path, 'r') as f:
+            parse = csv.reader(f)
+            next(parse, None)
+            dist=list(parse)
+    
+            adj_matrix=np.zeros((n_vertex,n_vertex))
+            for i in range(0,len(dist)):
+                fr=int(dist[i][0])
+                t=int(dist[i][1])
+                d=float(dist[i][2])
+                print(fr,t,d)
+                adj_matrix[fr][t]=d
+            return adj_matrix
+
+    #generate weighted adjacency matrix
+    def preprocess_adj_matrix(self,adj_matrix, sigma, threshold=0.1):
+        tmp=np.multiply(adj_matrix, adj_matrix)
+        wt_matrix=np.exp(tmp/(-sigma*sigma))
+        wt_matrix[wt_matrix<threshold]=0
+        return wt_matrix
+

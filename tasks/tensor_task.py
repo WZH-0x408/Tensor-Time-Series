@@ -1,4 +1,6 @@
-import os
+import os, sys
+pth = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(pth)  # ./Tensor-Time-Series
 import yaml
 import torch
 import numpy as np
